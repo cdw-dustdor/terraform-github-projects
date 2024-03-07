@@ -10,9 +10,9 @@ terraform {
 provider "aws" {}
 
 resource "aws_vpc" "vpc" {
-  cidr_block = "10.42.0.0/24"
+  cidr_block = var.cidr_block # "10.42.0.0/24"
 
   tags = {
-    Name = "vpc-dustin-terraform-github-projects"
+    Name = var.name # "vpc-dustin-terraform-github-projects"
   }
 }
