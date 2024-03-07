@@ -11,4 +11,8 @@ provider "aws" {}
 
 resource "aws_vpc" "vpc" {
   cidr_block = "10.42.0.0/24"
+
+  tags = {
+    Name = "vpc-dustin-terraform-github-projects"
+  }
 }
