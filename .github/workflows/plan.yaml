@@ -14,38 +14,64 @@ permissions:
   pull-requests: write
 
 jobs:
-  TerraformPlan:
+  terraform_plan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        id: gh-checkout
         uses: actions/checkout@v2
 
       - name: Authenticate to AWS
+        id: aws-login
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Terraform Setup
+        id: tf-setup
+        uses: hashicorp/setup-terraform@v2
 
       - name: Terraform Backend
-        id: Backend
+        id: tf-set-backend
         run: |
           cat > backend.tf << EOF
           terraform {
             backend "s3" {
-              bucket         = "dustin-s3-terraform-state"
-              key            = "terraform-github-projects/terraform.tfstate"
+              bucket         = "${{ vars.TERRAFORM_BACKEND_S3_BUCKET }}"
+              key            = "${{ vars.TERRAFORM_BACKEND_S3_KEY }}/terraform.tfstate"
               region         = "${{ env.AWS_REGION }}"
-              dynamodb_table = "dustin-ddb-terraform-state"
+              dynamodb_table = "${{ vars.TERRAFORM_BACKEND_S3_DYNAMODB_TABLE }}"
             }
           }
           EOF
 
+      - name: List files
+        id: list-files
+        run: ls -la
+
       - name: Terraform Init
+        id: tf-init
         run: terraform init
 
+      - name: Terraform Format
+        id: tf-fmt
+        run: terraform fmt -check
+  
+      - name: Terraform Validate
+        id: tf-validate
+        run: terraform validate
+
       - name: Terraform Plan
+        id: tf-plan
         run: terraform plan -out=tfplan
+
+      - name: Upload Build Artifacts
+        id: upload-artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: terraform-plan.artifacts
+          path: ./
 
 
 ...
