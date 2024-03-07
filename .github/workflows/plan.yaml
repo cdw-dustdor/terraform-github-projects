@@ -13,7 +13,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  Terraform Plan:
+  TerraformPlan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,9 +33,10 @@ jobs:
           cat > backend.tf << EOF
           terraform {
             backend "s3" {
-              bucket  = "dustin-s3-terraform-state"
-              key     = "terraform-github-projects/terraform.tfstate"
-              region  = "${{ env.AWS_REGION }}"
+              bucket         = "dustin-s3-terraform-state"
+              key            = "terraform-github-projects/terraform.tfstate"
+              region         = "${{ env.AWS_REGION }}"
+              dynamodb_table = "dustin-ddb-terraform-state"
             }
           }
           EOF
