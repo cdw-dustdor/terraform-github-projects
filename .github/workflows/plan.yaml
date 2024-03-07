@@ -1,0 +1,50 @@
+---
+
+name: Terraform Apply on Pull Request
+
+on: [pull_request, push]
+
+env:
+  AWS_REGION: "us-east-1"
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  Terraform Plan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Authenticate to AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::709143748493:role/dustin-github-oidc-role
+          role-session-name: github-actions
+          aws-region: ${{ env.AWS_REGION }}
+
+
+      - name: Terraform Backend
+        id: Backend
+        run: |
+          cat > backend.tf << EOF
+          terraform {
+            backend "s3" {
+              bucket  = "dustin-s3-terraform-state"
+              key     = "terraform-github-projects/terraform.tfstate"
+              region  = "${{ env.AWS_REGION }}"
+            }
+          }
+          EOF
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+
+...
