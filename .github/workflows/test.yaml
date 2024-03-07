@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    # if: github.ref == 'refs/heads/releases/${{ vars.release }}'
+    if: github.ref == 'refs/tags/v${{ vars.release }}*'
     steps:
       - run: echo ${{ matrix.environment }}
       - run: echo ${{ vars.TF_VAR_cidr_block }}
