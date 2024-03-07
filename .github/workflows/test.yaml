@@ -1,0 +1,17 @@
+---
+name: Test Matrix Output
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set matrix
+        id: set-matrix
+        run: |
+          echo "::set-output name=matrix::{\"1.0\":[\"prod-use1\", \"prod-usw1\"],\"1.1\":[\"prod-usc1\"]}"
+...
