@@ -12,7 +12,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
-        run: echo "::set-output name=matrix::${{ toJson(vars.RELEASES) }}"
+        run: echo "::set-output name=matrix::${{ vars.RELEASES }}"
   work_with_matrix:
     needs: create_matrix
     runs-on: ubuntu-latest
