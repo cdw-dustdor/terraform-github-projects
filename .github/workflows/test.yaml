@@ -8,10 +8,20 @@ jobs:
   build_matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ fromJson(steps.set-matrix.outputs.matrix) }}
     steps:
       - name: Set matrix
         id: set-matrix
         run: |
-          echo "::set-output name=matrix::{\"1.0\":[\"prod-use1\", \"prod-usw1\"],\"1.1\":[\"prod-usc1\"]}"
+          echo "{\"1.0\":[\"prod-use1\", \"prod-usw1\"],\"1.1\":[\"prod-usc1\"]}"
+
+  work_with_output:
+    needs: build_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ needs.build_matrix.outputs.matrix }}
+    steps:
+      - name: Print
+        run: |
+          echo "Running on ${{ matrix }}"
 ...
