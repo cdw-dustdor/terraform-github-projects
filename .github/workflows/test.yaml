@@ -5,23 +5,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_matrix:
+  create_matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ fromJson(steps.set-matrix.outputs.matrix) }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Set matrix
-        id: set-matrix
-        run: |
-          echo "{\"1.0\":[\"prod-use1\", \"prod-usw1\"],\"1.1\":[\"prod-usc1\"]}"
-
-  work_with_output:
-    needs: build_matrix
+      - id: set-matrix
+        run: echo "::set-output name=matrix::{\"include\":[{\"environment\":\"prod-use1\",\"release\":\"1.0\"},{\"environment\":\"prod-usw1\",\"release\":\"1.0\"}]}"
+  work_with_matrix:
+    needs: create_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ needs.build_matrix.outputs.matrix }}
+      matrix: ${{fromJson(needs.create_matrix.outputs.matrix)}}
     steps:
-      - name: Print
-        run: |
-          echo "Running on ${{ matrix }}"
+      - run: echo ${{ matrix.environment }}
+      - run: echo ${{ matrix.release }}
 ...
