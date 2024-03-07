@@ -21,8 +21,9 @@ jobs:
     environment: ${{ matrix.environment }}
     if: github.ref == 'refs/tags/v${{ vars.release }}*'
     steps:
-      - run: echo ${{ matrix.environment }}
-      - run: echo ${{ vars.TF_VAR_cidr_block }}
-      - run: echo ${{ github.ref}}
+      - run: echo ENVIRONMENT ${{ matrix.environment }}
+      - run: echo CIDR_BLOCK ${{ vars.TF_VAR_cidr_block }}
+      - run: echo RELEASE ${{ vars.release }}
+      - run: echo REF${{ github.ref}}
 
 ...
