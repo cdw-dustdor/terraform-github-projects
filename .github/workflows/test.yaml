@@ -8,16 +8,20 @@ jobs:
   create_matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ fromJson(steps.set-matrix.outputs.matrix) }}
     steps:
       - id: set-matrix
-        run: echo "::set-output name=matrix::{\"include\":[{\"environment\":\"prod-use1\",\"release\":\"1.0\"},{\"environment\":\"prod-usw1\",\"release\":\"1.0\"}]}"
+        run: echo "::set-output name=matrix::{\"include\":[{\"environment\":\"prod-use1\"},{\"environment\":\"prod-usw1\"},{{\"environment\":\"prod-usc1\"}}]}"
   work_with_matrix:
     needs: create_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{fromJson(needs.create_matrix.outputs.matrix)}}
+      matrix: ${{ needs.create_matrix.outputs.matrix }}
+    environment: ${{ matrix.environment }}
+    env:
+      release: ${{ matrix.release }}
+    if: ${{ vars.release }} == '1.0'
     steps:
       - run: echo ${{ matrix.environment }}
-      - run: echo ${{ matrix.release }}
+      - run: echo ${{ vars.TF_VAR_cidr_block }}
 ...
