@@ -10,6 +10,8 @@ on:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
   AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  TF_VAR_cidr_block: ${{ vars.TF_VAR_cidr_block }}
+  TF_VAR_name: ${{ vars.TF_VAR_name }}
 
 permissions:
   contents: read
