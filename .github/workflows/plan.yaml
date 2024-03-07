@@ -76,13 +76,19 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: terraform-plan.artifacts
-          path: ./
+          path: |
+            tfplan
+            backend.tf
 
   terraform_deploy:
     name: Deploy
     needs: [ terraform_plan ]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        id: gh-checkout
+        uses: actions/checkout@v2
+
       - name: Authenticate to AWS
         id: aws-login
         uses: aws-actions/configure-aws-credentials@v1
