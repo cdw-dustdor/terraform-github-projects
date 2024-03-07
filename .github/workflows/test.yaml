@@ -3,9 +3,7 @@ name: Test Matrix Output
 
 on:
   push:
-    branches:
-      - releases/*
-  workflow_dispatch:
+    tags: [ 'v*.*.*' ]
 
 jobs:
   create_matrix:
@@ -21,8 +19,10 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    if: github.ref == 'refs/heads/releases/${{ vars.release }}'
+    # if: github.ref == 'refs/heads/releases/${{ vars.release }}'
     steps:
       - run: echo ${{ matrix.environment }}
       - run: echo ${{ vars.TF_VAR_cidr_block }}
+      - run: echo ${{ github.ref}}
+
 ...
