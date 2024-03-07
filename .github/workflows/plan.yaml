@@ -32,6 +32,10 @@ jobs:
         id: tf-setup
         uses: hashicorp/setup-terraform@v2
 
+      - name: Terraform Version
+        id: tf-version
+        run: terraform version
+
       - name: Terraform Backend
         id: tf-set-backend
         run: |
@@ -73,5 +77,39 @@ jobs:
           name: terraform-plan.artifacts
           path: ./
 
+  terraform_deploy:
+    name: Deploy
+    needs: [ terraform_plan ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate to AWS
+        id: aws-login
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Setup
+        id: tf-setup
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Download Build Artifacts
+        id: download-artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform-plan.artifacts
+          path: ./
+
+      - name: Terraform Apply
+        id: tf-apply
+        run: terraform apply tfplan
+
+      - name: Terraform Output
+        id: tf-output
+        run: terraform output
+
+      - name: Terraform Show
+        id: tf-show
+        run: terraform show
 
 ...
