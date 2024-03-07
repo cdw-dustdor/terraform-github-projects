@@ -5,7 +5,8 @@ name: Terraform Apply on Pull Request
 on: [pull_request, push]
 
 env:
-  AWS_REGION: "us-east-1"
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
 
 permissions:
   contents: read
@@ -22,8 +23,7 @@ jobs:
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::709143748493:role/dustin-github-oidc-role
-          role-session-name: github-actions
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
 
