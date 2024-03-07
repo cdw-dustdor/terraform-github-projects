@@ -2,6 +2,9 @@
 name: Test Matrix Output
 
 on:
+  push:
+    branches:
+      - releases/*
   workflow_dispatch:
 
 jobs:
@@ -20,7 +23,7 @@ jobs:
     environment: ${{ matrix.environment }}
     env:
       release: ${{ matrix.release }}
-    if: ${{ vars.release }} == '1.0'
+    if: github.ref == 'refs/heads/releases/${{ vars.release }}'
     steps:
       - run: echo ${{ matrix.environment }}
       - run: echo ${{ vars.TF_VAR_cidr_block }}
