@@ -11,10 +11,30 @@ jobs:
   create_matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      matrix: ${{ steps.set-matrix.outputs.current_env }}
+    env:
+      owner: ${{ github.repository_owner }}
+      repo: ${{ github.repository }}
+      release: ${{ github.ref_name }}
     steps:
+      - run: |
+          echo "OWNER: ${owner}"
+          echo "REPO: ${repo}"
+          echo "RELEASE: ${release}"
       - id: set-matrix
-        run: echo "::set-output name=matrix::${{ vars.RELEASES }}"
+        run: |
+          set -eux
+          environments=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/environments | jq -r '.environments[] | .name' -)
+          echo -n "{\"include\":[" > current_releases.json
+          for environment in $environments; do
+            echo -n $(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/environments/${environment}/variables | jq '.variables[] | select(.name == "RELEASE" and .value == $ARGS.positional[0]) | {environment: $ARGS.positional[1], release: .value}' --args $ref_name $environment -) | sed 's/\({.*}\)/\1, /' >> current_releases.json
+          done
+          sed -i'' -e 's/, $//' current_releases.json
+          echo -n "]}" >> current_releases.json
+          sed -i'' -e 's/"/\\"/g' current_releases.json
+          echo "matrix=$(cat current_releases.json)"
+      - run: cat currrent_releases.json
+
 
   work_with_matrix:
     needs: create_matrix
@@ -22,7 +42,6 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    if: ${{ github.ref_name == vars.RELEASE }}
     steps:
       - run: echo ENVIRONMENT ${{ matrix.environment }}
       - run: echo CIDR_BLOCK ${{ vars.TF_VAR_cidr_block }}
