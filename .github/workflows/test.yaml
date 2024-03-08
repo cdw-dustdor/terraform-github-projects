@@ -6,6 +6,11 @@ on:
     branches:
       - releases/**
 
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
 jobs:
 
   create_matrix:
