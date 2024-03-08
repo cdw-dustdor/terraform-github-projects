@@ -6,10 +6,11 @@ on:
     branches:
       - releases/**
 
-permissions: write-all
-  # contents: read
-  # id-token: write
-  # pull-requests: write
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+  repository-projects: write
 
 jobs:
 
