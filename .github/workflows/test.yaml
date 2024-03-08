@@ -11,7 +11,7 @@ jobs:
   create_matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.current_env }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     env:
       owner: ${{ github.repository_owner }}
       repo: ${{ github.repository }}
