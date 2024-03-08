@@ -16,6 +16,7 @@ jobs:
       owner: ${{ github.repository_owner }}
       repo: ${{ github.repository }}
       release: ${{ github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - run: |
           echo "REPO: ${repo}"
