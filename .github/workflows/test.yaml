@@ -19,13 +19,12 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    if: startsWith(github.ref_name, "v${{ vars.release }}") && github.ref_type == 'tag'
+    if: startsWith(github.ref_name, 'v${{ vars.release }}') && github.ref_type == 'tag'
     steps:
       - run: echo ENVIRONMENT ${{ matrix.environment }}
       - run: echo CIDR_BLOCK ${{ vars.TF_VAR_cidr_block }}
       - run: echo RELEASE ${{ vars.release }}
       - run: echo REF_NAME ${{ github.ref_name}}
       - run: echo REF_TYPE ${{ github.ref_type}}
-      - run: echo RELEASES ${{ fromJson(needs.create_matrix.outputs.matrix) }}
 
 ...
