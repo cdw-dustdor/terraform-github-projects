@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    # if: ${{ github.ref_name == vars.release }}
+    if: ${{ github.ref_name == vars.release }}
     steps:
       - run: echo ENVIRONMENT ${{ matrix.environment }}
       - run: echo CIDR_BLOCK ${{ vars.TF_VAR_cidr_block }}
