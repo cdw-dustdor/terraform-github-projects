@@ -1,0 +1,33 @@
+---
+name: Test Matrix Output
+
+on:
+  push:
+    branches:
+      - releases/**
+
+jobs:
+
+  create_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "::set-output name=matrix::${{ vars.RELEASES }}"
+
+  work_with_matrix:
+    needs: create_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
+    environment: ${{ matrix.environment }}
+    if: startsWith(github.ref_name, vars.release) && github.ref_type == 'branch'
+    steps:
+      - run: echo ENVIRONMENT ${{ matrix.environment }}
+      - run: echo CIDR_BLOCK ${{ vars.TF_VAR_cidr_block }}
+      - run: echo RELEASE ${{ vars.release }}
+      - run: echo REF_NAME ${{ github.ref_name}}
+      - run: echo REF_TYPE ${{ github.ref_type}}
+
+...
