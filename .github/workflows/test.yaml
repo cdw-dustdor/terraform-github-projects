@@ -37,7 +37,8 @@ jobs:
     outputs:
       release: ${{ vars.release }}
     steps:
-      - run: echo "RELASE ${{ vars.release}}"
+      - run: echo "Invalid job"
+        if: github.ref_name != vars.release
 
   # run_workflow:
   #   needs:
