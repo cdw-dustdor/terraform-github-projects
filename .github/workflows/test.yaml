@@ -14,31 +14,37 @@ permissions:
 
 jobs:
 
-  create_matrix:
+  environment_matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     env:
-      owner: ${{ github.repository_owner }}
       repo: ${{ github.repository }}
-      release: ${{ github.ref_name }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - id: set-matrix
         run: |
           echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '{include: [ .environments[] | {environment: .name} ]} | tojson' -)" >> $GITHUB_OUTPUT
 
-  get_release:
-    needs: create_matrix
+  environment_exclude:
+    needs: environment_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     outputs:
       release: ${{ vars.release }}
     steps:
-      - run: echo "Invalid job"
+      - id: get_release
+        run: |
+          echo "BRANCH: ${{ github.ref_name }}"
+          echo "RELEASE: ${{ vars.release }}"
+      - id: exclude-matrix
         if: github.ref_name != vars.release
+        run: |
+          echo "matrix=$(jq -r '{exclude: [ { environment: ${{ matrix.environment }} } ]} | tojson' -)" >> $GITHUB_OUTPUT
+          echo "EXCLUDE: ${{ matrix.environment }}"
+        
 
   # run_workflow:
   #   needs:
