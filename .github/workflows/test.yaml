@@ -36,15 +36,17 @@ jobs:
     environment: ${{ matrix.environment }}
     outputs:
       release: ${{ vars.release }}
+    steps:
+      - run: echo "RELASE ${{ vars.release}}"
 
-  run_workflow:
-    needs:
-      - create_matrix
-      - get_release
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
-    environment: ${{ matrix.environment }}
-    if: github.ref_name == needs.get_release.outputs.release
+  # run_workflow:
+  #   needs:
+  #     - create_matrix
+  #     - get_release
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
+  #   environment: ${{ matrix.environment }}
+  #   if: github.ref_name == needs.get_release.outputs.release
 
 ...
