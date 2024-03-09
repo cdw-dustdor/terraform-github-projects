@@ -33,16 +33,16 @@ jobs:
       matrix: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     outputs:
-      release: ${{ vars.release }}
+      matrix: ${{ steps.exclude-matrix.outputs.matrix }}
     steps:
-      - id: get_release
+      - id: get-release
         run: |
           echo "BRANCH: ${{ github.ref_name }}"
           echo "RELEASE: ${{ vars.release }}"
       - id: exclude-matrix
         if: github.ref_name != vars.release
         run: |
-          echo "matrix=$(jq -r '{exclude: [ { environment: ${{ matrix.environment }} } ]} | tojson' -)" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "${{ matrix.environment }}" | jq -Rr '{exclude: [ {environment: .}]} | tojson' -)" >> $GITHUB_OUTPUT
           echo "EXCLUDE: ${{ matrix.environment }}"
         
 
