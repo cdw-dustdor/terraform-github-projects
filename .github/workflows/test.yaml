@@ -27,7 +27,7 @@ jobs:
       - id: set-matrix
         run: |
           set -eux
-          echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq '{include: [ .environments[] | {environment: .name} ]} | tojson' -)" >> $GITHUB_OUTPUT
+          echo "::set-output name=matrix::$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq '{include: [ .environments[] | {environment: .name} ]} | tojson' -)"
 
 
 
