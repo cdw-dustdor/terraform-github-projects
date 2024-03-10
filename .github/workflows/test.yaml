@@ -58,7 +58,7 @@ jobs:
       - name: Run Workflow
         run: |
           set -eux
-          echo "${{ fromJson(needs.environment_exclude.outputs.*.matrix) }}"
+          echo "${{ fromJson(needs.environment_exclude.outputs.matrix.*) }}"
           echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
 ...
