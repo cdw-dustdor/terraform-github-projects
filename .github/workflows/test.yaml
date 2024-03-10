@@ -55,7 +55,7 @@ jobs:
       - id: print
         run: |
           set -eux
-          echo "${{ fromJson(steps.read.outputs.result) }}" | jq '[.exclude | keys[] | {environment: .}] | tojson'
+          echo "${{ steps.read.outputs.result }}" | jq '[.exclude | keys[] | {environment: .}] | tojson'
     outputs:
       result: "${{ fromJson(steps.read.outputs.result) }}"
 
