@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+        include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
         exlude: ${{ fromJson(needs.filtered_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
