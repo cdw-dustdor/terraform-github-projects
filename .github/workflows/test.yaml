@@ -55,9 +55,9 @@ jobs:
       - id: print
         run: |
           set -eux
-          echo "${{ steps.read.outputs.environment }}"
+          echo "${{ steps.read.outputs.result }}"
     outputs:
-      result: "${{ steps.read.outputs.environment }}"
+      result: "${{ steps.read.outputs.result }}"
 
   run_workflow:
     needs: filtered_matrix
