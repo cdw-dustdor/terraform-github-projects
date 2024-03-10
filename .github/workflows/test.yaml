@@ -42,7 +42,7 @@ jobs:
           matrix-step-name: ${{ github.job }}
           matrix-key: ${{ matrix.environment }}
           outputs: |-
-            environment: ${{ matrix.environment }}
+            exclude: ${{ matrix.environment }}
 
   filtered_matrix:
     needs: matrix_exclude
