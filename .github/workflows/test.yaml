@@ -64,7 +64,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-          pattern: "matrix.*"
       - id: list-files
         name: List files
         run: ls -la
