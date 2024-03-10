@@ -40,9 +40,9 @@ jobs:
         if: github.ref_name != vars.release
         with:
           matrix-step-name: exclude-matrix
-          matrix-key: ${{ matrix.environment }}
+          matrix-key: environment
           outputs: |-
-            exclude: true
+            exclude: ${{ matrix.environment }}
 
   filtered_matrix:
     needs: matrix_exclude
