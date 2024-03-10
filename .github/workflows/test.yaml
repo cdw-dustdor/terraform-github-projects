@@ -51,7 +51,7 @@ jobs:
       - id: read
         uses: cloudposse/github-action-matrix-outputs-read@v1
         with:
-          matrix-step-name: matrix_exclude
+          matrix-step-name: exclude-matrix
       - id: print
         run: |
           set -eux
