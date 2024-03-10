@@ -40,9 +40,9 @@ jobs:
         if: github.ref_name != vars.release
         with:
           matrix-step-name: ${{ github.job }}
-          matrix-key: environment
+          matrix-key: ${{ matrix.environment }}
           outputs: |-
-            exclude: ${{ matrix.environment }}
+            environment: ${{ matrix.environment }}
 
   filtered_matrix:
     needs: matrix_exclude
@@ -55,9 +55,9 @@ jobs:
       - id: print
         run: |
           set -eux
-          echo "${{ steps.read.outputs.result }}"
+          echo "${{ steps.read.outputs.environment }}"
     outputs:
-      result: "${{ steps.read.outputs.result }}"
+      result: "${{ steps.read.outputs.environment }}"
 
   run_workflow:
     needs: filtered_matrix
