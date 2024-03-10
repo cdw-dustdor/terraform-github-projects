@@ -39,7 +39,7 @@ jobs:
         uses: cloudposse/github-action-matrix-outputs-write@v1
         if: github.ref_name != vars.release
         with:
-          matrix-step-name: ${{ github.job }}
+          matrix-step-name: exclude-matrix
           matrix-key: ${{ matrix.environment }}
           outputs: |-
             exclude: true
