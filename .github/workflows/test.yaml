@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: github.ref_name != vars.release
         with:
-          name: $(echo "{\"environment\":\"${{ matrix.environment }}\"}" | sha256sum | awk '{print $1}')
+          name: ${{ matrix.environment }}
           path: exclude-file
 
   filtered_matrix:
