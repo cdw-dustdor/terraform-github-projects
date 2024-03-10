@@ -49,7 +49,9 @@ jobs:
       - environment_exclude
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.environment_matrix.outputs.matrix) }} ${{fromJson(needs.environment_exclude.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+        exclude: ${{fromJson(needs.environment_exclude.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
       - name: Run Workflow
