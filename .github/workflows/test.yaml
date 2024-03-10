@@ -35,43 +35,44 @@ jobs:
         include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
-      - id: exclude-matrix
-        uses: cloudposse/github-action-matrix-outputs-write@v1
+      - id: exclude-file
+        if: github.ref_name != vars.release
+        run: |
+          set -eux
+          echo "{\"environment\":\"${{ matrix.environment }}\"}" > exclude-file
+      - id: upload-artifact
+        uses: actions/upload-artifact@v2
         if: github.ref_name != vars.release
         with:
-          matrix-step-name: exclude-matrix
-          matrix-key: "${{ matrix.environment }}"
-          outputs: |-
-            "exclude": "${{ matrix.environment }}"
+          name: $(echo "{\"environment\":\"${{ matrix.environment }}\"}" | sha256sum | awk '{print $1}')
+          path: exclude-file
 
   filtered_matrix:
     needs: matrix_exclude
     runs-on: ubuntu-latest
     steps:
-      - id: read
-        uses: cloudposse/github-action-matrix-outputs-read@v1
+      - id: download-artifact
+        uses: actions/download-artifact@v4
         with:
-          matrix-step-name: exclude-matrix
+          merge-multiple: true
       - id: print
         run: |
           set -eux
-          echo "${{ steps.read.outputs.result }}" | jq '[.exclude | keys[] | {environment: .}] | tojson'
-    outputs:
-      result: "${{ fromJson(steps.read.outputs.result) }}"
+          ls -l
 
-  run_workflow:
-    needs: filtered_matrix
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
-        exlude: ${{ fromJson(needs.filtered_matrix.outputs.result) }}
-    environment: ${{ matrix.environment }}
-    steps:
-      - name: Run Workflow
-        run: |
-          set -eux
-          echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
-          echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
+  # run_workflow:
+  #   needs: filtered_matrix
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+  #       exlude: ${{ fromJson(needs.filtered_matrix.outputs.result) }}
+  #   environment: ${{ matrix.environment }}
+  #   steps:
+  #     - name: Run Workflow
+  #       run: |
+  #         set -eux
+  #         echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
+  #         echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
 ...
