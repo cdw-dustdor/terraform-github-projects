@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
-        exclude: ${{fromJson(needs.environment_exclude.outputs.matrix) }}
+        # exclude: ${{fromJson(needs.environment_exclude.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
       - name: Run Workflow
