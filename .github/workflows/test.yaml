@@ -23,6 +23,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - id: set-matrix
+        name: Create matrix inclusions
         run: |
           set -eux
           echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
@@ -37,12 +38,14 @@ jobs:
     steps:
       - id: exclude-file
         if: github.ref_name != vars.release
+        name: Create exclusion file
         run: |
           set -eux
           echo "{\"environment\":\"${{ matrix.environment }}\"}" > exclude-file
       - id: upload-artifact
-        uses: actions/upload-artifact@v2
+        name: Upload artifacts
         if: github.ref_name != vars.release
+        uses: actions/upload-artifact@v2
         with:
           name: "matrix.${{ matrix.environment }}"
           path: exclude-file
@@ -54,13 +57,14 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: download-artifact
+        name: Download artifacts
         uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
       - id: list-files
+        name: List files
         run: |
           ls -la
       - id: set-matrix
+        name: Create matrix exclusion
         run: |
           set -eux
           echo "matrix=$(jq -s '. | tojson' exclude-file*)" >> $GITHUB_OUTPUT
@@ -74,7 +78,8 @@ jobs:
         exlude: ${{ fromJson(needs.filtered_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
-      - name: Run Workflow
+      - id: run-workflow
+        name: Run workflow
         run: |
           set -eux
           echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
