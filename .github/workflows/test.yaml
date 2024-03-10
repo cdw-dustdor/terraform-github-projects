@@ -14,7 +14,7 @@ permissions:
 
 jobs:
 
-  environment_matrix:
+  build_matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -27,32 +27,49 @@ jobs:
           set -eux
           echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
 
-  environment_exclude:
-    needs: environment_matrix
+  matrix_exclude:
+    needs: build_matrix
     runs-on: ubuntu-latest
     strategy:
       matrix: 
-        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+        include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    outputs:
-      matrix: ${{ steps.exclude-matrix.outputs.matrix }}
     steps:
       - id: exclude-matrix
         if: github.ref_name != vars.release
         run: |
           set -eux
           echo "matrix=$(echo "${{ matrix.environment }}" | jq -Rr '[ {environment: .}] | tojson' -)" >> $GITHUB_OUTPUT
+      - id: out
+        uses: cloudposse/github-action-matrix-outputs-write@v1
+        with:
+          matrix-step-name: ${{ github.job }}
+          matrix-key: ${{ matrix.environment }}
+          outputs: |-
+            exclude: ${{ steps.build.exclude-matrix.matrix }}
 
+  filtered_matrix:
+    needs: matrix_exclude
+    runs-on: ubuntu-latest
+    steps:
+      - id: read
+        uses: cloudposse/github-action-matrix-outputs-read@v1
+        with:
+          matrix-step-name: matrix_exclude
+      - id: print
+        run: |
+          set -eux
+          echo "${{ steps.read.outputs.result }}"
+    outputs:
+      result: "${{ steps.read.outputs.result }}"
 
   run_workflow:
-    needs:
-      - environment_matrix
-      - environment_exclude
+    needs: filtered_matrix
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
-        # exclude: ${{fromJson(needs.environment_exclude.outputs.matrix) }}
+        exlude: ${{ fromJson(needs.filtered_matrix.outputs.result) }}
     environment: ${{ matrix.environment }}
     steps:
       - name: Run Workflow
