@@ -57,10 +57,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+      - id: list-files
+        run: |
+          ls -la
       - id: set-matrix
         run: |
           set -eux
-          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -s '. | tojson' exclude-file*)" >> $GITHUB_OUTPUT
 
   run_workflow:
     needs: filtered_matrix
