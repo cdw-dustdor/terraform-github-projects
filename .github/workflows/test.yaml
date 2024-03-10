@@ -55,9 +55,9 @@ jobs:
       - id: print
         run: |
           set -eux
-          echo "${{ steps.read.outputs.result }}"
+          echo "${{ fromJson(steps.read.outputs.result) }}" | jq '[.exclude | keys[] | {environment: .}] | tojson'
     outputs:
-      result: "${{ steps.read.outputs.result }}"
+      result: "${{ fromJson(steps.read.outputs.result) }}"
 
   run_workflow:
     needs: filtered_matrix
