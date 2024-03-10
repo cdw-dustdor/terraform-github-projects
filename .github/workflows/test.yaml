@@ -41,7 +41,7 @@ jobs:
         name: Create exclusion file
         run: |
           set -eux
-          echo "{\"environment\":\"${{ matrix.environment }}\"}" > exclude-file
+          echo "{\"environment\":\"${{ matrix.environment }}\"}" > matrix.${{ matrix.environment }}
       - id: list-files
         name: List files
         run: ls -la
@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "matrix.${{ matrix.environment }}"
-          path: exclude-file
+          path: "matrix.${{ matrix.environment }}"
 
   filtered_matrix:
     needs: matrix_exclude
@@ -72,7 +72,7 @@ jobs:
         name: Create matrix exclusion
         run: |
           set -eux
-          echo "matrix=$(jq -s '. | tojson' exclude-file*)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
 
   run_workflow:
     needs: filtered_matrix
