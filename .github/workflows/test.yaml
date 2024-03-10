@@ -42,6 +42,9 @@ jobs:
         run: |
           set -eux
           echo "{\"environment\":\"${{ matrix.environment }}\"}" > exclude-file
+      - id: list-files
+        name: List files
+        run: ls -la
       - id: upload-artifact
         name: Upload artifacts
         if: github.ref_name != vars.release
@@ -61,8 +64,7 @@ jobs:
         uses: actions/download-artifact@v4
       - id: list-files
         name: List files
-        run: |
-          ls -la
+        run: ls -la
       - id: set-matrix
         name: Create matrix exclusion
         run: |
