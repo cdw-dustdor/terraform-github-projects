@@ -25,13 +25,14 @@ jobs:
       - id: set-matrix
         run: |
           set -eux
-          echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '{include: [ .environments[] | {environment: .name} ]} | tojson' -)" >> $GITHUB_OUTPUT
+          echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
 
   environment_exclude:
     needs: environment_matrix
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+      matrix: 
+        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     outputs:
       matrix: ${{ steps.exclude-matrix.outputs.matrix }}
@@ -40,7 +41,7 @@ jobs:
         if: github.ref_name != vars.release
         run: |
           set -eux
-          echo "matrix=$(echo "${{ matrix.environment }}" | jq -Rr '{exclude: [ {environment: .}]} | tojson' -)" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "${{ matrix.environment }}" | jq -Rr '[ {environment: .}] | tojson' -)" >> $GITHUB_OUTPUT
 
 
   run_workflow:
