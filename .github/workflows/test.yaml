@@ -44,35 +44,37 @@ jobs:
         uses: actions/upload-artifact@v2
         if: github.ref_name != vars.release
         with:
-          name: ${{ matrix.environment }}
+          name: "matrix.${{ matrix.environment }}"
           path: exclude-file
 
   filtered_matrix:
     needs: matrix_exclude
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: download-artifact
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-      - id: print
+      - id: set-matrix
         run: |
           set -eux
-          ls -l
+          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
 
-  # run_workflow:
-  #   needs: filtered_matrix
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
-  #       exlude: ${{ fromJson(needs.filtered_matrix.outputs.result) }}
-  #   environment: ${{ matrix.environment }}
-  #   steps:
-  #     - name: Run Workflow
-  #       run: |
-  #         set -eux
-  #         echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
-  #         echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
+  run_workflow:
+    needs: filtered_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.environment_matrix.outputs.matrix) }}
+        exlude: ${{ fromJson(needs.filtered_matrix.outputs.matrix) }}
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Run Workflow
+        run: |
+          set -eux
+          echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
+          echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
 ...
