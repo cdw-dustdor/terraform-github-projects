@@ -36,10 +36,6 @@ jobs:
     outputs:
       matrix: ${{ steps.exclude-matrix.outputs.matrix }}
     steps:
-      - id: get-release
-        run: |
-          echo "BRANCH: ${{ github.ref_name }}"
-          echo "RELEASE: ${{ vars.release }}"
       - id: exclude-matrix
         if: github.ref_name != vars.release
         run: |
@@ -47,14 +43,19 @@ jobs:
           echo "matrix=$(echo "${{ matrix.environment }}" | jq -Rr '{exclude: [ {environment: .}]} | tojson' -)" >> $GITHUB_OUTPUT
 
 
-  # run_workflow:
-  #   needs:
-  #     - create_matrix
-  #     - get_release
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix: ${{ fromJson(needs.create_matrix.outputs.matrix) }}
-  #   environment: ${{ matrix.environment }}
-  #   if: github.ref_name == needs.get_release.outputs.release
+  run_workflow:
+    needs:
+      - environment_matrix
+      - environment_exclude
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.environment_exclude.outputs.matrix) }}
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Run Workflow
+        run: |
+          set -eux
+          echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
+          echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
 ...
