@@ -26,7 +26,10 @@ jobs:
         name: Create matrix inclusions
         run: |
           set -eux
-          echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
+          matrix="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)"
+          echo $matrix
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          # echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
 
   matrix_exclude:
     needs: build_matrix
