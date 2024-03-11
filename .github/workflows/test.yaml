@@ -30,7 +30,7 @@ jobs:
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
-  matrix_exclude:
+  matrix_pruned:
     needs: build_matrix
     runs-on: ubuntu-latest
     strategy:
@@ -38,8 +38,8 @@ jobs:
         include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
-      - id: exclude-file
-        if: github.ref_name != vars.release
+      - id: new-matrix
+        if: github.ref_name == vars.release
         name: Create exclusion file
         run: |
           set -eux
@@ -49,14 +49,14 @@ jobs:
         run: ls -la
       - id: upload-artifact
         name: Upload artifacts
-        if: github.ref_name != vars.release
+        if: github.ref_name == vars.release
         uses: actions/upload-artifact@v4
         with:
           name: "matrix.${{ matrix.environment }}"
           path: "matrix.${{ matrix.environment }}"
 
   filtered_matrix:
-    needs: matrix_exclude
+    needs: matrix_pruned
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -72,7 +72,7 @@ jobs:
         name: List files
         run: ls -la
       - id: set-matrix
-        name: Create matrix exclusion
+        name: Create pruned matrix
         run: |
           set -eux
           matrix="$(jq -rs '. | tojson' matrix.*)"
@@ -85,8 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJson(needs.build_matrix.outputs.matrix) }}
-        exlude: ${{ fromJson(needs.filtered_matrix.outputs.matrix) }}
+        include: ${{ fromJson(needs.filtered_matrix.outputs.matrix) }}
     environment: ${{ matrix.environment }}
     steps:
       - id: run-workflow
