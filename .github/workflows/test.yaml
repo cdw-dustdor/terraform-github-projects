@@ -72,7 +72,9 @@ jobs:
         name: Create matrix exclusion
         run: |
           set -eux
-          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
+          matrix="$(jq -s '. | tojson' matrix.*)"
+          echo "$matrix"
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
   run_workflow:
     needs: filtered_matrix
@@ -87,7 +89,7 @@ jobs:
         name: Run workflow
         run: |
           set -eux
-          echo "${{ fromJson(needs.environment_exclude.outputs.matrix) }}"
+          echo "${{ fromJson(needs.filtered_matrix.outputs.matrix) }}"
           echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
 
 ...
