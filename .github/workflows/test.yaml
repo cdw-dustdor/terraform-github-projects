@@ -72,9 +72,8 @@ jobs:
         name: Create matrix exclusion
         run: |
           set -eux
-          matrix="$(jq -s '. | tojson' matrix.*)"
-          echo "$matrix"
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          jq -s '. | tojson' matrix.*
+          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
 
   run_workflow:
     needs: filtered_matrix
