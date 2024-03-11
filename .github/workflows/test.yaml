@@ -92,6 +92,6 @@ jobs:
         name: Run workflow
         run: |
           set -eux
-          echo "Running workflow for ${{ matrix.environment }}" >> $GITHUB_OUTPUT
+          echo "Running workflow for ${{ matrix.environment }}"
 
 ...
