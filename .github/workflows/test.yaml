@@ -29,7 +29,6 @@ jobs:
           matrix="$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)"
           echo $matrix
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-          # echo "matrix=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${repo}/environments | jq -r '[ .environments[] | {environment: .name} ] | tojson' -)" >> $GITHUB_OUTPUT
 
   matrix_exclude:
     needs: build_matrix
@@ -76,8 +75,10 @@ jobs:
         name: Create matrix exclusion
         run: |
           set -eux
-          jq -s '. | tojson' matrix.*
-          echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
+          matrix="$(jq -s '. | tojson' matrix.*)"
+          echo $matrix
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          # echo "matrix=$(jq -s '. | tojson' matrix.*)" >> $GITHUB_OUTPUT
 
   run_workflow:
     needs: filtered_matrix
