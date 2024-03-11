@@ -48,7 +48,7 @@ jobs:
       - id: upload-artifact
         name: Upload artifacts
         if: github.ref_name != vars.release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: "matrix.${{ matrix.environment }}"
           path: "matrix.${{ matrix.environment }}"
@@ -61,9 +61,10 @@ jobs:
     steps:
       - id: download-artifact
         name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: .
+          pattern: matrix.*
       - id: list-files
         name: List files
         run: ls -la
