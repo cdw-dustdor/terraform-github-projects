@@ -1,0 +1,23 @@
+name: Creation of new Release branch
+
+on:
+  create:
+    branches:
+      - releases/**
+
+jobs:
+  enforce-base-branch:
+    runs-on: ubuntu-latest
+    # if: github.event.head_ref != 'main'
+    steps:
+      - name: Bad release branch creation
+        run: |
+          echo "repository is ${{ github.repository }}"
+          echo "action repository is ${{ github.action_repository }}"
+          echo "event is ${{ github.event_name }}"
+          echo "head_ref is ${{ github.event.head_ref }}"
+          echo "base_ref is ${{ github.event.base_ref }}"
+          echo "ref_name is ${{ github.ref_name }}"
+          echo "branch protection: ${{ github.ref_protected }}"
+          echo "You can only create release branches from the main branch"
+          exit 1
