@@ -21,7 +21,7 @@ jobs:
           echo "branch protection: ${{ github.ref_protected }}"
   enforce-base-branch:
     runs-on: ubuntu-latest
-    # if: github.ref_name != github.event.repository.default_branch
+    if: github.ref_name != github.event.repository.default_branch
     steps:
       - name: Bad release branch creation
         run: |
